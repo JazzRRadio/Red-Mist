@@ -259,7 +259,7 @@ public class MapManager : MonoBehaviour
             Debug.Log(generationRadius + " + " + generationCenterChunkPosition);
             Extension newExtension = Extension.CreateMapExtension(generationRadius, generationCenterChunkPosition);
             DataManager.Instance.currentGameData.data.info.mapExtensions.Add(newExtension);
-            DataManager.Instance.SaveData();
+            DataManager.Instance.SaveFile();
         }
     }
 

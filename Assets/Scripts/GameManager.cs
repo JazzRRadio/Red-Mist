@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviour
     public void SaveGame()
     {
         sc_ResourceManager?.SaveResourceData(DataManager.Instance.currentGameData.data.info);
-        DataManager.Instance.SaveData();
+        DataManager.Instance.SaveFile();
     }
 
     public static GameManager Instance { get; private set; }

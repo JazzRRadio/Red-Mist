@@ -1,8 +1,10 @@
+using JetBrains.Annotations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using static GameInfo;
 
 public class BuildingPlacer : MonoBehaviour
 {
@@ -127,6 +129,7 @@ public class BuildingPlacer : MonoBehaviour
         }
     }
 
+    // Placed the entity.
     private void PlaceBuilding()
     {
         CostCheck.RemoveCost(buildingLayoutAsset);
@@ -144,6 +147,18 @@ public class BuildingPlacer : MonoBehaviour
         {
             sc_BuildingCheck.PlaceOccupiedTiles();
         }
+
+        BuildingsData buildingData = SaveBuildingData(curPlacamentPos, buildingLayoutAsset);
+        DataManager.Instance.SaveData(buildingData);
+    }
+
+    private BuildingsData SaveBuildingData(Vector3 position, BuildingAssets building)
+    {
+        BuildingsData data = new BuildingsData();
+        data.buildingPosition = position;
+        data.buildingName = building.name;
+        data.buildingID = go_BuildingLayout.GetInstanceID();
+        return data;
     }
 
     private void SpriteTransparency(float alphaLevel)

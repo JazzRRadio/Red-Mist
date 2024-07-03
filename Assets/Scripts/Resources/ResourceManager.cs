@@ -20,7 +20,7 @@ public class ResourceManager : MonoBehaviour
             default:
                 AddLevel();
                 SaveResourceData(DataManager.Instance.currentGameData.data.info);
-                DataManager.Instance.SaveData();
+                DataManager.Instance.SaveFile();
                 break;
 
             case DataManager.GameState.LoadMap:

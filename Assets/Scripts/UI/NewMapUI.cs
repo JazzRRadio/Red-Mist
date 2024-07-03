@@ -30,10 +30,19 @@ public class NewMapUI : MonoBehaviour
             System.Random random = new System.Random();
             int randomSeed = random.Next();
             seed = randomSeed;
-        }        
-        DataManager.Instance.currentGameData = DataManager.NewSaveFile(cityName, seed);
+        }
 
-        DataManager.Instance.gameState = DataManager.GameState.NewMap;
-        SceneManager.LoadScene(0);
+        DataInfo newData = DataManager.NewSaveFile(cityName, seed);
+
+        if (newData != null)
+        {
+            DataManager.Instance.currentGameData = newData;
+            DataManager.Instance.gameState = DataManager.GameState.NewMap;
+            SceneManager.LoadScene(0);
+        }
+        else
+        {
+            // A pop up appears warn you that the city name already exists.
+        }
     }
 }

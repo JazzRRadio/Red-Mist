@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using UnityEngine;
+using static GameInfo;
 
 public class DataManager : MonoBehaviour
 {
@@ -80,27 +81,37 @@ public class DataManager : MonoBehaviour
     // Creates a new GameData file.
     public static DataInfo NewSaveFile(string _cityName, int _mapSeed)
     {
-        GameData gameData = new GameData();
+        string _fileName = _cityName.ToLower();
 
-        gameData.meta.cityName = _cityName;
-        gameData.info.mapSeed = _mapSeed;
-        gameData.meta.daysPlayed = 0;
-        var culture = new CultureInfo("en-Gb");
-        gameData.meta.lastPlayDate = DateTime.Now.ToString(culture);
+        if (!File.Exists(Application.persistentDataPath + _cityName + "GameData.json"))
+        {
+            GameData gameData = new GameData();
+            gameData.meta.cityName = _cityName;
+            gameData.info.mapSeed = _mapSeed;
+            gameData.meta.fileName = _fileName;
+            gameData.meta.daysPlayed = 0;
+            var culture = new CultureInfo("en-Gb");
+            gameData.meta.lastPlayDate = DateTime.Now.ToString(culture);
 
-        string filePath = Path.Combine(Application.persistentDataPath, _cityName + "GameData.json");
-        string jsonData = JsonUtility.ToJson(gameData, true);
+            string filePath = Path.Combine(Application.persistentDataPath, _fileName + "GameData.json");
+            string jsonData = JsonUtility.ToJson(gameData, true);
 
-        DataInfo dataInfo = DataInfo.CreateDataInfo(filePath, gameData);
+            DataInfo dataInfo = DataInfo.CreateDataInfo(filePath, gameData);
 
-        dataList.Add(dataInfo);
-        File.WriteAllText(filePath, jsonData);
+            dataList.Add(dataInfo);
+            File.WriteAllText(filePath, jsonData);
 
-        return dataInfo;
+            return dataInfo;
+        }
+        else
+        {
+            return null;
+        }
+
     }
 
     // Saves the game to the current GameData file.
-    public void SaveData()
+    public void SaveFile()
     {
         var culture = new CultureInfo("en-Gb");
         currentGameData.data.meta.lastPlayDate = DateTime.Now.ToString(culture);
@@ -109,6 +120,23 @@ public class DataManager : MonoBehaviour
         File.WriteAllText(currentGameData.path, jsonData);
 
         Debug.Log("Game saved!");
+    }
+
+    public void SaveData<T>(T dataType) where T : class
+    {
+        switch (dataType)
+        {
+            case ValuesPerResource valuesPerResource:
+                currentGameData.data.info.resourcesData.Add(valuesPerResource);
+                break;
+
+            case BuildingsData buildingsData:
+                currentGameData.data.info.buildingsData.Add(buildingsData);
+                break;
+
+            default:
+                break;
+        }
     }
 }
 
@@ -128,7 +156,7 @@ public class DataInfo
 
     public static GameData ReadData(string path)
     {
-        GameData _data = new GameData(); 
+        GameData _data = new GameData();
         string jsonData = File.ReadAllText(path);
         _data = JsonUtility.FromJson<GameData>(jsonData);
         return _data;
@@ -151,6 +179,7 @@ public class GameData
 public class Meta
 {
     public string cityName;
+    public string fileName;
     public int daysPlayed;
     public string lastPlayDate;
 }
@@ -165,23 +194,30 @@ public class GameInfo
     public int gameLevel;
 
     public List<ValuesPerResource> resourcesData = new List<ValuesPerResource>();
-    
-    [Serializable]
-    public class ValuesPerResource
-    {
-        public string name;
-        public List<ValuesPerLevel> resourcesValues = new List<ValuesPerLevel>();
-    }
-    
-    [Serializable]
-    public class ValuesPerLevel
-    {
-        public int level;
-        public int amount;
-        public int delta;
-        public int maxStorage;
-    }
+
+    public List<BuildingsData> buildingsData = new List<BuildingsData>();
 }
 
+[Serializable]
+public class ValuesPerResource
+{
+    public string name;
+    public List<ValuesPerLevel> resourcesValues = new List<ValuesPerLevel>();
+}
 
+[Serializable]
+public class ValuesPerLevel
+{
+    public int level;
+    public int amount;
+    public int delta;
+    public int maxStorage;
+}
 
+[Serializable]
+public class BuildingsData
+{
+    public Vector3 buildingPosition;
+    public string buildingName;
+    public int buildingID;
+}
